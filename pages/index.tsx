@@ -478,7 +478,15 @@ export default function Home() {
                 >
                   <div className="flex flex-col sm:flex-row">
                     <div className="relative w-full sm:w-2/5 aspect-[3/4] sm:aspect-auto sm:min-h-[320px] shrink-0">
-                      <Image src={p.photo} alt={p.name} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 28vw" quality={68} />
+                      <Image
+                        src={p.photo}
+                        alt={p.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 28vw"
+                        quality={68}
+                        unoptimized
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-black/60 via-black/10 to-transparent" />
                       <div className="absolute left-5 bottom-5 sm:hidden">
                         <div className="text-xl font-semibold">{p.name}</div>
@@ -624,7 +632,15 @@ export default function Home() {
                 >
                   <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} borderWidth={3} />
                   <div className="relative h-60">
-                    <Image src={e.photo} alt={e.title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" sizes="(max-width: 768px) 100vw, 30vw" quality={65} />
+                    <Image
+                      src={e.photo}
+                      alt={e.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      sizes="(max-width: 768px) 100vw, 30vw"
+                      quality={65}
+                      unoptimized
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
                     <div className="absolute left-5 bottom-5">
                       <div className="flex items-center gap-2 mb-1.5">
@@ -687,6 +703,7 @@ export default function Home() {
                           className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
                           sizes="(max-width: 768px) 100vw, 30vw"
                           quality={60}
+                          unoptimized
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/0" />
                         <div className="absolute left-5 bottom-4">
