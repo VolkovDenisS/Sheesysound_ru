@@ -1,0 +1,14 @@
+services:
+  sheesysound:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sheesysound
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}

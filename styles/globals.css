@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 10, 10, 15;
+    --background-end-rgb: 10, 10, 15;
+}
+
+body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-start-rgb));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+/* Custom styles for studio branding */
+.glass-panel {
+    @apply bg-white/[0.03] backdrop-blur-md border border-white/10;
+}
+
+.button-hot-violet {
+    @apply bg-violet-600/20 border-violet-400/30 hover:bg-violet-600/30;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+.button-glass-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.button-glass-shine::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+.button-glass-shine-gold::after {
+    background: linear-gradient(45deg,
+            transparent,
+            rgba(255, 236, 179, 0.24),
+            transparent);
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
+@keyframes border-beam {
+    100% {
+        offset-distance: 100%;
+    }
+}
+
+@keyframes meteor {
+    0% {
+        transform: rotate(215deg) translateX(0);
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotate(215deg) translateX(-500px);
+        opacity: 0;
+    }
+}
+
+.animate-border-beam {
+    animation: border-beam calc(var(--duration)*1s) infinite linear;
+}
+
+.animate-meteor-effect {
+    animation: meteor 5s linear infinite;
+}

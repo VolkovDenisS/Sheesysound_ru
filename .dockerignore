@@ -1,0 +1,12 @@
+.git
+.gitignore
+.next
+node_modules
+npm-debug.log
+dev-server.log
+dev-server.err.log
+.env.local
+README.md
+Dockerfile
+docker-compose.yml
+*.tsbuildinfo
