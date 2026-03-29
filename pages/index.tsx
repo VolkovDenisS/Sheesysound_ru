@@ -209,7 +209,7 @@ const GALLERY = [
 
 const CASES = [
   { title: "Saluki", subtitle: "Продакшн", image: "/cases/saluki.jpg", note: "Продакшн и финальное звучание." },
-  { title: "TRUWER", subtitle: "Продакшн", image: "/cases/truewer.jpg", note: "Продакшн и работа над стилем." },
+  { title: "TRUWER", subtitle: "Продакшн", image: "/cases/truewer.jpg", note: "Продакшн и работа над стилем.", objectPosition: "50% 16%" },
   { title: "Gunnr", subtitle: "Продакшн", image: "/cases/gunnr.jpg", note: "Продакшн и контроль вокальной обработки." },
   { title: "Friendly Thugg 52 NGG", subtitle: "Продакшн", image: "/cases/friendly.jpg", note: "Продакшн под стиль и вайб." },
   { title: "Katekey • Johny Core", subtitle: "Продакшн", image: "/cases/katekey_johnycore.jpg", note: "Совместные проекты и звук." },
@@ -701,6 +701,7 @@ export default function Home() {
                           alt={c.title}
                           fill
                           className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
+                          style={c.objectPosition ? { objectPosition: c.objectPosition } : undefined}
                           sizes="(max-width: 768px) 100vw, 30vw"
                           quality={60}
                           unoptimized
