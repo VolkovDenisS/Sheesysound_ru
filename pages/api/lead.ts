@@ -7,6 +7,19 @@ type Body = {
   consent?: boolean;
 };
 
+type RelayPayload = {
+  name: string;
+  contact: string;
+  message: string;
+  consent: true;
+  consentAt: string;
+  ip: string;
+  userAgent: string;
+  referer: string;
+  fields: string[];
+  source: string;
+};
+
 function getIp(req: NextApiRequest) {
   const forwarded = req.headers["x-forwarded-for"];
 
@@ -17,46 +30,51 @@ function getIp(req: NextApiRequest) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).json({ ok: false, error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "Method not allowed" });
+  }
 
   const { name, contact, message, consent }: Body = (req.body || {}) as Body;
-  if (!name || !contact) return res.status(400).json({ ok: false, error: "Missing fields" });
-  if (!consent) return res.status(400).json({ ok: false, error: "Consent required" });
+  if (!name || !contact) {
+    return res.status(400).json({ ok: false, error: "Missing fields" });
+  }
 
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return res.status(500).json({ ok: false, error: "Telegram env not set" });
+  if (!consent) {
+    return res.status(400).json({ ok: false, error: "Consent required" });
+  }
 
-  const now = new Date().toLocaleString("ru-RU");
-  const ip = getIp(req) || "-";
-  const userAgent = req.headers["user-agent"] || "-";
-  const referer = req.headers.referer || req.headers.referrer || "-";
+  const relayUrl = process.env.RELAY_URL;
+  const relaySecret = process.env.RELAY_SHARED_SECRET;
 
-  const text =
-    `Новая заявка ШИЗИ САУНД\n` +
-    `Имя: ${name}\n` +
-    `Контакт: ${contact}\n` +
-    `Запрос: ${message || "-"}\n` +
-    `\n` +
-    `Согласие на обработку ПДн: да\n` +
-    `Дата и время согласия: ${now}\n` +
-    `IP: ${ip}\n` +
-    `User-Agent: ${userAgent}\n` +
-    `Referer: ${referer}\n` +
-    `Поля формы: name, contact, message`;
+  if (!relayUrl || !relaySecret) {
+    return res.status(500).json({ ok: false, error: "Relay env not set" });
+  }
 
-  const tgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+  const payload: RelayPayload = {
+    name,
+    contact,
+    message: message || "",
+    consent: true,
+    consentAt: new Date().toLocaleString("ru-RU"),
+    ip: getIp(req) || "-",
+    userAgent: String(req.headers["user-agent"] || "-"),
+    referer: String(req.headers.referer || req.headers.referrer || "-"),
+    fields: ["name", "contact", "message"],
+    source: "sheesysound.ru",
+  };
 
   try {
-    const r = await fetch(tgUrl, {
+    const response = await fetch(relayUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${relaySecret}`,
+      },
+      body: JSON.stringify(payload),
     });
 
-    if (!r.ok) {
-      const errText = await r.text();
-      return res.status(500).json({ ok: false, error: errText });
+    if (!response.ok) {
+      throw new Error(await response.text());
     }
 
     return res.status(200).json({ ok: true });

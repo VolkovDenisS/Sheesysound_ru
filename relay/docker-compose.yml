@@ -1,0 +1,14 @@
+services:
+  sheesysound-relay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sheesysound-relay
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PORT:-8787}:8787"
+    environment:
+      PORT: ${PORT:-8787}
+      RELAY_SHARED_SECRET: ${RELAY_SHARED_SECRET}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}

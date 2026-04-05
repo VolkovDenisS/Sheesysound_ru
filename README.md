@@ -272,6 +272,41 @@ docker-compose up -d --build --force-recreate
 
 Если бот уже светился в публичных логах, переписке или скриншотах, токен лучше перевыпустить через `@BotFather`.
 
+## Relay через FI VPS
+
+Если RU VPS не имеет прямого доступа к `api.telegram.org`, проект поддерживает relay-схему:
+
+- основной сайт отправляет заявку на внешний relay-endpoint
+- relay-сервис на FI VPS принимает запрос
+- relay уже сам отправляет сообщение в Telegram
+
+Для основного сайта используются переменные:
+
+```env
+RELAY_URL=http://89.125.74.178:8787/notify
+RELAY_SHARED_SECRET=put_shared_secret_here
+```
+
+Под relay в репозитории есть отдельная папка:
+
+- [relay](./relay)
+
+Внутри неё лежат:
+
+- Docker-конфиг
+- `.env.example`
+- минимальный backend для пересылки заявок в Telegram
+- отдельный [README](./relay/README.md) с командами запуска
+
+Типовой сценарий:
+
+1. На FI VPS клонировать репозиторий
+2. Перейти в `relay`
+3. Создать `.env`
+4. Запустить `docker-compose up -d --build`
+5. На RU VPS прописать `RELAY_URL` и `RELAY_SHARED_SECRET`
+6. Пересобрать контейнер основного сайта
+
 ## Структура проекта
 
 - [pages/index.tsx](./pages/index.tsx) — основная страница
