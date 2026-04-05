@@ -27,7 +27,10 @@
 
 ## Переменные окружения
 
-Проект использует Telegram-бота для уведомлений из формы.
+Проект поддерживает два сценария отправки заявок:
+
+- прямую отправку в Telegram из основного сайта
+- relay-схему `RU VPS -> FI VPS -> Telegram`
 
 Скопируй шаблон:
 
@@ -35,14 +38,21 @@
 cp .env.example .env.local
 ```
 
-или создай файл вручную:
+Для Docker на сервере удобнее использовать `.env`.
+
+### Вариант 1. Прямая отправка в Telegram
 
 ```env
 TELEGRAM_BOT_TOKEN=put_your_token_here
 TELEGRAM_CHAT_ID=put_chat_id_here
 ```
 
-Для Docker на сервере удобнее использовать `.env`.
+### Вариант 2. Отправка через relay на FI VPS
+
+```env
+RELAY_URL=http://your-fi-relay-host:8787/notify
+RELAY_SHARED_SECRET=put_shared_secret_here
+```
 
 ## Локальный запуск
 
@@ -223,11 +233,20 @@ cd Sheesysound_ru
 cp .env.example .env
 ```
 
-Заполни значения:
+Заполни `.env` в зависимости от выбранной схемы:
+
+Прямая отправка в Telegram:
 
 ```env
 TELEGRAM_BOT_TOKEN=your_token
 TELEGRAM_CHAT_ID=your_chat_id
+```
+
+Или отправка через relay:
+
+```env
+RELAY_URL=http://your-fi-relay-host:8787/notify
+RELAY_SHARED_SECRET=your_shared_secret
 ```
 
 ### 4. Поднять контейнер
@@ -283,7 +302,7 @@ docker-compose up -d --build --force-recreate
 Для основного сайта используются переменные:
 
 ```env
-RELAY_URL=http://89.125.74.178:8787/notify
+RELAY_URL=http://your-fi-relay-host:8787/notify
 RELAY_SHARED_SECRET=put_shared_secret_here
 ```
 
@@ -298,17 +317,52 @@ RELAY_SHARED_SECRET=put_shared_secret_here
 - минимальный backend для пересылки заявок в Telegram
 - отдельный [README](./relay/README.md) с командами запуска
 
-Типовой сценарий:
+Пошаговая настройка relay-связки:
 
-1. На FI VPS клонировать репозиторий
-2. Перейти в `relay`
-3. Создать `.env`
-4. Запустить `docker-compose up -d --build`
-5. Убедиться, что на FI VPS открыт входящий порт `8787` для RU VPS или для теста из внешней сети
-5. На RU VPS прописать `RELAY_URL` и `RELAY_SHARED_SECRET`
-6. Пересобрать контейнер основного сайта
+1. На FI VPS клонировать репозиторий:
+   ```bash
+   git clone https://github.com/VolkovDenisS/Sheesysound_ru.git
+   cd Sheesysound_ru/relay
+   ```
+2. На FI VPS создать `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   и заполнить:
+   ```env
+   PORT=8787
+   RELAY_SHARED_SECRET=your_shared_secret
+   TELEGRAM_BOT_TOKEN=your_token
+   TELEGRAM_CHAT_ID=your_chat_id
+   ```
+3. На FI VPS запустить relay:
+   ```bash
+   docker-compose up -d --build
+   ```
+4. На FI VPS проверить сервис:
+   ```bash
+   curl http://127.0.0.1:8787/health
+   ```
+5. На FI VPS открыть входящий порт `8787` для RU VPS или на время теста из внешней сети.
+6. На RU VPS прописать в `.env`:
+   ```env
+   RELAY_URL=http://your-fi-relay-host:8787/notify
+   RELAY_SHARED_SECRET=your_shared_secret
+   ```
+7. На RU VPS пересобрать контейнер основного сайта:
+   ```bash
+   docker-compose down --remove-orphans
+   docker ps -a --format '{{.Names}}' | grep sheesysound | xargs -r docker rm -f
+   docker-compose up -d --build --force-recreate
+   ```
+8. На RU VPS проверить API:
+   ```bash
+   curl -X POST http://127.0.0.1:3000/api/lead \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Тест","contact":"+79999999999","message":"Проверка через relay","consent":true}'
+   ```
 
-Важно: по умолчанию relay публикуется наружу на порт `8787`, чтобы RU VPS мог обратиться к нему по адресу вроде `http://89.125.74.178:8787/notify`. После проверки схемы лучше ограничить доступ firewall-правилом по IP RU VPS или поставить перед relay HTTPS-прокси.
+Важно: по умолчанию relay публикуется наружу на порт `8787`, чтобы RU VPS мог обратиться к нему по адресу вида `http://your-fi-relay-host:8787/notify`. После проверки схемы лучше ограничить доступ firewall-правилом по IP RU VPS или поставить перед relay HTTPS-прокси.
 
 ## Структура проекта
 
