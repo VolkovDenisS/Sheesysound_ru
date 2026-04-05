@@ -10,5 +10,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      RELAY_URL: ${RELAY_URL}
+      RELAY_SHARED_SECRET: ${RELAY_SHARED_SECRET}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
