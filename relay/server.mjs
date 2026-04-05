@@ -18,10 +18,11 @@ function getBearerToken(req) {
 function buildTelegramText(payload) {
   return (
     `Новая заявка ШИЗИ САУНД\n` +
-    `Имя: ${payload.name}\n` +
-    `Контакт: ${payload.contact}\n` +
-    `Запрос: ${payload.message || "-"}\n` +
+    `👤 Имя: ${payload.name}\n` +
+    `☎️ Контакт: ${payload.contact}\n` +
+    `✍️ Запрос: ${payload.message || "-"}\n` +
     `\n` +
+    `====================================\n` +
     `Согласие на обработку ПДн: да\n` +
     `Дата и время согласия: ${payload.consentAt || "-"}\n` +
     `IP: ${payload.ip || "-"}\n` +
