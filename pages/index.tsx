@@ -1216,6 +1216,7 @@ function GalleryItem({ src, distance, eager, onClick }: { src: string; distance:
 
 function ContactCard({ onBook }: { onBook: () => void }) {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
+  const [consentChecked, setConsentChecked] = useState(false);
 
   return (
     <motion.div
@@ -1239,6 +1240,7 @@ function ContactCard({ onBook }: { onBook: () => void }) {
             name: String(fd.get("name") || ""),
             contact: String(fd.get("contact") || ""),
             message: String(fd.get("message") || ""),
+            consent: fd.get("consent") === "on",
           };
 
           try {
@@ -1251,6 +1253,7 @@ function ContactCard({ onBook }: { onBook: () => void }) {
 
             if (r.ok) {
               form.reset();
+              setConsentChecked(false);
               setStatus("ok");
               setTimeout(() => setStatus("idle"), 2200);
             } else {
@@ -1280,6 +1283,35 @@ function ContactCard({ onBook }: { onBook: () => void }) {
           className="w-full min-h-[110px] rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-violet-400/40"
           placeholder="Что нужно? (запись / сведение / под ключ)"
         />
+
+        <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/70">
+          <input
+            name="consent"
+            type="checkbox"
+            checked={consentChecked}
+            onChange={(e) => setConsentChecked(e.target.checked)}
+            onInvalid={(e) =>
+              e.currentTarget.setCustomValidity(
+                "Чтобы отправить заявку, необходимо согласиться с Политикой конфиденциальности."
+              )
+            }
+            onInput={(e) => e.currentTarget.setCustomValidity("")}
+            className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent accent-violet-500"
+            required
+          />
+          <span>
+            Я согласен(а) на обработку персональных данных в соответствии с{" "}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noreferrer"
+              className="text-white underline underline-offset-4"
+            >
+              Политикой конфиденциальности
+            </a>
+            .
+          </span>
+        </label>
 
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
           <MagneticButton onClick={onBook} variant="primary">
@@ -1412,7 +1444,15 @@ function Footer() {
     >
       <div className="mx-auto max-w-6xl px-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="text-sm text-white/60">© {new Date().getFullYear()} ШИЗИ САУНД • Краснодар, ул. Героя Сарабеева 9/1</div>
-        <div className="text-sm text-white/50">Политика конфиденциальности • Публичная оферта</div>
+        <div className="flex items-center gap-4 text-sm text-white/50">
+          <a href="/privacy" className="transition hover:text-white/80">
+            Политика конфиденциальности
+          </a>
+          <span className="text-white/20">•</span>
+          <a href="/offer" className="transition hover:text-white/80">
+            Публичная оферта
+          </a>
+        </div>
       </div>
     </motion.footer>
   );
