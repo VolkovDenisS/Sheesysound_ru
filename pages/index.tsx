@@ -1215,9 +1215,6 @@ function GalleryItem({ src, distance, eager, onClick }: { src: string; distance:
 }
 
 function ContactCard({ onBook }: { onBook: () => void }) {
-  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
-  const [consentChecked, setConsentChecked] = useState(false);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -1227,105 +1224,22 @@ function ContactCard({ onBook }: { onBook: () => void }) {
       className="md:col-span-7 rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 p-6"
     >
       <div className="text-xl font-semibold">Быстрая заявка</div>
-      <p className="mt-2 text-sm text-white/65">Оставь контакт — мы уточним задачу и предложим лучший формат.</p>
+      <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
+        Напиши нам в Telegram: уточним задачу, подскажем формат и быстро договоримся о записи.
+      </p>
 
-      <form
-        className="mt-5 grid gap-3"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const form = e.currentTarget as HTMLFormElement;
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <MagneticButton href={TELEGRAM_URL} variant="primary" newTab>
+          Связаться с нами
+        </MagneticButton>
+        <MagneticButton onClick={onBook} variant="soft">
+          Сразу забронировать
+        </MagneticButton>
+      </div>
 
-          const fd = new FormData(form);
-          const payload = {
-            name: String(fd.get("name") || ""),
-            contact: String(fd.get("contact") || ""),
-            message: String(fd.get("message") || ""),
-            consent: fd.get("consent") === "on",
-          };
-
-          try {
-            setStatus("sending");
-            const r = await fetch("/api/lead", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            if (r.ok) {
-              form.reset();
-              setConsentChecked(false);
-              setStatus("ok");
-              setTimeout(() => setStatus("idle"), 2200);
-            } else {
-              setStatus("err");
-              setTimeout(() => setStatus("idle"), 2600);
-            }
-          } catch {
-            setStatus("err");
-            setTimeout(() => setStatus("idle"), 2600);
-          }
-        }}
-      >
-        <input
-          name="name"
-          className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-violet-400/40"
-          placeholder="Имя"
-          required
-        />
-        <input
-          name="contact"
-          className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-violet-400/40"
-          placeholder="Телефон / Telegram"
-          required
-        />
-        <textarea
-          name="message"
-          className="w-full min-h-[110px] rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-violet-400/40"
-          placeholder="Что нужно? (запись / сведение / под ключ)"
-        />
-
-        <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/70">
-          <input
-            name="consent"
-            type="checkbox"
-            checked={consentChecked}
-            onChange={(e) => setConsentChecked(e.target.checked)}
-            onInvalid={(e) =>
-              e.currentTarget.setCustomValidity(
-                "Чтобы отправить заявку, необходимо согласиться с Политикой конфиденциальности."
-              )
-            }
-            onInput={(e) => e.currentTarget.setCustomValidity("")}
-            className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent accent-violet-500"
-            required
-          />
-          <span>
-            Я согласен(а) на обработку персональных данных в соответствии с{" "}
-            <a
-              href="/privacy"
-              target="_blank"
-              rel="noreferrer"
-              className="text-white underline underline-offset-4"
-            >
-              Политикой конфиденциальности
-            </a>
-            .
-          </span>
-        </label>
-
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-          <MagneticButton onClick={onBook} variant="primary">
-            Лучше сразу забронировать
-          </MagneticButton>
-          <button
-            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 h-12 text-sm leading-none hover:bg-white/10 transition"
-            type="submit"
-            disabled={status === "sending"}
-          >
-            {status === "sending" ? "Отправляем..." : status === "ok" ? "Отправлено ✅" : status === "err" ? "Ошибка ❌" : "Отправить заявку"}
-          </button>
-        </div>
-      </form>
+      <p className="mt-4 text-xs leading-5 text-white/45">
+        Telegram: <span className="font-semibold text-white/65">{TELEGRAM_HANDLE}</span>
+      </p>
     </motion.div>
   );
 }
