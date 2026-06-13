@@ -176,7 +176,11 @@ docker-compose logs -f
 APP_PORT=3004 docker compose up -d --build
 ```
 
-Для старого `docker-compose` можно заранее записать `APP_PORT` в `.env`.
+Для старого `docker-compose` можно передать порт перед командой:
+
+```bash
+APP_PORT=3004 docker-compose up -d --build
+```
 
 ## Production-деплой на VPS
 
